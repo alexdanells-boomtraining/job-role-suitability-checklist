@@ -418,18 +418,18 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
           <div class="rating-guide-col">
             <h4>Level of exposure</h4>
             <ul>
-              <li><strong>Limited</strong> — The role touches this occasionally or only in a narrow context. Significant support or additional project work will be needed to build the required competence.</li>
-              <li><strong>Moderate</strong> — The role provides meaningful but not core exposure. The apprentice will encounter this regularly enough to develop with guidance.</li>
-              <li><strong>Significant</strong> — This is a core part of the role. The apprentice will have regular, substantive hands-on exposure that directly builds the required skills.</li>
+              <li class="guide-red"><strong>Limited</strong> — The role touches this occasionally or only in a narrow context. Significant support or additional project work will be needed to build the required competence.</li>
+              <li class="guide-amber"><strong>Moderate</strong> — The role provides meaningful but not core exposure. The apprentice will encounter this regularly enough to develop with guidance.</li>
+              <li class="guide-green"><strong>Significant</strong> — This is a core part of the role. The apprentice will have regular, substantive hands-on exposure that directly builds the required skills.</li>
             </ul>
           </div>
           <div class="rating-guide-col">
             <h4>How often will the apprentice encounter this?</h4>
             <ul>
-              <li><strong>Rarely</strong> — Less than once a month; only on specific projects or occasional tasks.</li>
-              <li><strong>Sometimes</strong> — A few times a month.</li>
-              <li><strong>Often</strong> — Several times a week.</li>
-              <li><strong>Daily</strong> — Every working day, or near-daily.</li>
+              <li class="guide-red"><strong>Rarely</strong> — Less than once a month; only on specific projects or occasional tasks.</li>
+              <li class="guide-amber"><strong>Sometimes</strong> — A few times a month.</li>
+              <li class="guide-green"><strong>Often</strong> — Several times a week.</li>
+              <li class="guide-green"><strong>Daily</strong> — Every working day, or near-daily.</li>
             </ul>
             <p class="rating-guide-note">Where exposure is <strong>Limited</strong> or <strong>Moderate</strong>, or frequency is <strong>Rarely</strong> or <strong>Sometimes</strong>, a written explanation is required.</p>
           </div>

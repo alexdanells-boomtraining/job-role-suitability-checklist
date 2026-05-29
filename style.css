@@ -366,11 +366,20 @@ body {
   font-size: 0.875rem;
   color: var(--text);
   line-height: 1.5;
-  padding-left: 0.75rem;
+  padding: 0.4rem 0.75rem;
   border-left: 3px solid var(--border);
+  border-radius: 0 4px 4px 0;
 }
 
 .rating-guide-col li strong { color: var(--navy); }
+
+.rating-guide-col li.guide-red   { border-left-color: #ef4444; background: #fff1f2; }
+.rating-guide-col li.guide-amber { border-left-color: #f59e0b; background: #fffbeb; }
+.rating-guide-col li.guide-green { border-left-color: #10b981; background: #f0fdf6; }
+
+.rating-guide-col li.guide-red   strong { color: #991b1b; }
+.rating-guide-col li.guide-amber strong { color: #92400e; }
+.rating-guide-col li.guide-green strong { color: #065f46; }
 
 .rating-guide-note {
   margin-top: 1rem;
