@@ -306,7 +306,7 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
         </div>
         <div class="meta-field">
           <label class="meta-label" for="meta-title">Job Title</label>
-          <input type="text" id="meta-title" class="text-input" placeholder="e.g. HR Manager" value="${meta.job_title || ''}" />
+          <input type="text" id="meta-title" class="text-input" placeholder="e.g. Data Manager, Head of Analytics, Insight Lead" value="${meta.job_title || ''}" />
         </div>
       </div>
     </div>
