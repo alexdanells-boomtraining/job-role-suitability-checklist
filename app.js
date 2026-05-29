@@ -174,16 +174,18 @@ function saveState(state) {
 
 // ── Suitability logic ─────────────────────────────────────
 
-function getSectionStatus(sec) {
-  if (!sec || !sec.exposure || !sec.frequency) return 'incomplete';
-  if (sec.exposure === 'limited' && sec.frequency === 'rarely') return 'concern';
-  if (sec.exposure === 'limited' || sec.frequency === 'rarely') return 'review';
-  return 'suitable';
-}
-
 function needsComment(sec) {
   if (!sec) return false;
-  return sec.exposure === 'limited' || sec.frequency === 'rarely';
+  return ['limited', 'moderate'].includes(sec.exposure) || ['rarely', 'sometimes'].includes(sec.frequency);
+}
+
+function getSectionStatus(sec) {
+  if (!sec || !sec.exposure || !sec.frequency) return 'incomplete';
+  if (needsComment(sec) && !sec.comment?.trim()) return 'incomplete';
+  if (sec.exposure === 'limited' && sec.frequency === 'rarely') return 'concern';
+  if (sec.exposure === 'limited' || sec.frequency === 'rarely') return 'review';
+  if (sec.exposure === 'moderate' || sec.frequency === 'sometimes') return 'review';
+  return 'suitable';
 }
 
 function getOverallVerdict(state) {
@@ -197,7 +199,9 @@ function getOverallVerdict(state) {
 function completedCount(state) {
   return DA_SKILL_GROUPS.filter(g => {
     const s = state.sections[g.id];
-    return s && s.exposure && s.frequency;
+    if (!s || !s.exposure || !s.frequency) return false;
+    if (needsComment(s) && !s.comment?.trim()) return false;
+    return true;
   }).length;
 }
 
@@ -360,7 +364,10 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
 
     <div class="form-actions">
       <button class="btn-reset" id="btn-reset">Clear &amp; Start Again</button>
-      <button class="btn-summary" id="btn-summary">View Suitability Summary</button>
+      <div class="form-actions-right">
+        <button class="btn-pdf hidden" id="btn-pdf">Save as PDF</button>
+        <button class="btn-summary" id="btn-summary">View Suitability Summary</button>
+      </div>
     </div>
 
     <div id="results-panel"></div>
@@ -400,7 +407,26 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
   });
 
   document.getElementById('btn-summary').addEventListener('click', () => {
+    // Find sections where a comment is required but missing
+    const missing = DA_SKILL_GROUPS.filter(g => {
+      const s = state.sections[g.id];
+      return s && s.exposure && s.frequency && needsComment(s) && !s.comment?.trim();
+    });
+    if (missing.length > 0) {
+      missing.forEach(g => {
+        const card = document.getElementById('card-' + g.id);
+        const commentArea = document.getElementById('comment-area-' + g.id);
+        if (card) {
+          card.querySelector('.section-card-body').classList.remove('collapsed');
+          card.querySelector('.section-toggle').textContent = '−';
+        }
+        if (commentArea) commentArea.classList.add('comment-error');
+      });
+      document.getElementById('card-' + missing[0].id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     renderResults(state);
+    document.getElementById('btn-pdf').classList.remove('hidden');
     setTimeout(() => document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' }), 50);
   });
 
@@ -409,6 +435,10 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
       localStorage.removeItem(STATE_KEY);
       renderContent();
     }
+  });
+
+  document.getElementById('btn-pdf').addEventListener('click', () => {
+    window.print();
   });
 }
 
@@ -467,7 +497,7 @@ function buildSectionCard(group, state, num) {
         </div>
       </div>
       <div class="comment-area${needsComment(sec) ? '' : ' hidden'}" id="comment-area-${group.id}">
-        <label class="field-label" for="comment-${group.id}">Please explain how exposure in this area will be achieved or supported:</label>
+        <label class="field-label" for="comment-${group.id}">Please explain how exposure in this area will be achieved or supported <span class="required-marker">— required</span></label>
         <textarea id="comment-${group.id}" class="comment-textarea" rows="3" placeholder="Describe how the apprentice will develop in this area, or any plans to increase their exposure during the programme..." data-group="${group.id}">${sec.comment || ''}</textarea>
       </div>
     </div>
@@ -495,9 +525,9 @@ function buildSectionCard(group, state, num) {
       const status = getSectionStatus(state.sections[gid]);
       card.className = 'section-card' + (status !== 'incomplete' ? ' status-' + status : '');
       card.querySelector('.section-status-dot').className = 'section-status-dot status-dot-' + status;
-      // Auto-collapse once both ratings are complete
+      // Auto-collapse once fully complete (ratings + required comment if applicable)
       const s = state.sections[gid];
-      if (s.exposure && s.frequency) {
+      if (s.exposure && s.frequency && (!needsComment(s) || s.comment?.trim())) {
         card.querySelector('.section-card-body').classList.add('collapsed');
         card.querySelector('.section-toggle').textContent = '+';
       }
@@ -505,13 +535,25 @@ function buildSectionCard(group, state, num) {
     });
   });
 
-  // Comment textarea
+  // Comment textarea — update status, progress, and clear error state on input
   const ta = card.querySelector('.comment-textarea');
   if (ta) {
     ta.addEventListener('input', () => {
       if (!state.sections[group.id]) state.sections[group.id] = {};
       state.sections[group.id].comment = ta.value;
       saveState(state);
+      const commentArea = document.getElementById('comment-area-' + group.id);
+      if (commentArea) commentArea.classList.remove('comment-error');
+      const st = getSectionStatus(state.sections[group.id]);
+      card.className = 'section-card' + (st !== 'incomplete' ? ' status-' + st : '');
+      card.querySelector('.section-status-dot').className = 'section-status-dot status-dot-' + st;
+      // Collapse once comment satisfies the requirement
+      const s = state.sections[group.id];
+      if (s.exposure && s.frequency && s.comment?.trim()) {
+        card.querySelector('.section-card-body').classList.add('collapsed');
+        card.querySelector('.section-toggle').textContent = '+';
+      }
+      updateProgress(state);
     });
   }
 

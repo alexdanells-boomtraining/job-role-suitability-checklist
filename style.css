@@ -398,6 +398,38 @@ body {
   box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
 }
 
+.required-marker {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: #b45309;
+  font-style: italic;
+}
+
+.comment-area.comment-error {
+  background: #fff1f2;
+  border-top-color: #ef4444;
+}
+
+.comment-area.comment-error .field-label { color: #991b1b; }
+
+.comment-area.comment-error .comment-textarea {
+  border-color: #ef4444;
+}
+
+.comment-area.comment-error .comment-textarea:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+
+.comment-area.comment-error::before {
+  content: 'A response is required before you can submit this checklist.';
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #991b1b;
+  margin-bottom: 0.5rem;
+}
+
 /* ── Tools section ───────────────────────────────────────── */
 .tools-intro {
   font-size: 0.875rem;
@@ -468,6 +500,12 @@ body {
   align-items: center;
   margin: 2rem 0;
   gap: 1rem;
+}
+
+.form-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .btn-reset {
@@ -704,3 +742,55 @@ body {
 
 .results-meta-row { display: flex; flex-direction: column; gap: 0.1rem; }
 .results-meta-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+/* ── PDF / print button ──────────────────────────────────── */
+.btn-pdf {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.btn-pdf:hover { border-color: var(--navy); color: var(--navy); }
+.btn-pdf.hidden { display: none; }
+
+/* ── Print / PDF styles ──────────────────────────────────── */
+@media print {
+  .site-header,
+  .demo-bar,
+  .form-progress,
+  #skill-sections,
+  #tools-card,
+  .additional-card,
+  .form-actions,
+  .results-footer { display: none !important; }
+
+  body { background: white; }
+
+  .main-content { margin: 0; padding: 0; max-width: 100%; }
+
+  .checklist-header { margin-bottom: 1rem; }
+
+  .results-panel-inner { margin-top: 0; }
+
+  .results-meta,
+  .verdict-banner,
+  .results-table-wrap,
+  .results-tools { break-inside: avoid; }
+
+  .results-table { font-size: 0.8rem; }
+
+  .verdict-suitable       { background: #d1fae5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .verdict-review         { background: #fef3c7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .verdict-not-recommended{ background: #fee2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .verdict-incomplete     { background: #f3f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .results-table thead { background: #1a1b2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .result-row-review  { background: #fffbeb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .result-row-concern { background: #fff1f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
