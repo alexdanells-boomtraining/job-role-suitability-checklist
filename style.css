@@ -138,6 +138,30 @@ body {
   margin-bottom: 2rem;
 }
 
+.version-tag {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.standard-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--green-dim);
+  text-decoration: none;
+}
+
+.standard-link:hover { text-decoration: underline; }
+
+.standard-link-inline {
+  font-size: 0.875rem;
+  color: var(--green-dim);
+  text-decoration: none;
+}
+
+.standard-link-inline:hover { text-decoration: underline; }
+
 .checklist-header .level-badge {
   display: inline-block;
   background: var(--green);
