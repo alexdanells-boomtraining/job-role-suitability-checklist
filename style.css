@@ -446,6 +446,11 @@ body {
   gap: 1rem;
 }
 
+.rating-group + .rating-group {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
 .rating-group {
   display: flex;
   flex-direction: column;
