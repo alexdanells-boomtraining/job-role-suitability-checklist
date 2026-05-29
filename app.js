@@ -448,7 +448,7 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
     <div class="form-actions">
       <button class="btn-reset" id="btn-reset">Clear &amp; Start Again</button>
       <div class="form-actions-right">
-        <button class="btn-pdf" id="btn-pdf">Save as PDF</button>
+        <button class="btn-pdf" id="btn-pdf" disabled>Save as PDF</button>
         <button class="btn-summary" id="btn-summary">View Suitability Summary</button>
       </div>
     </div>
@@ -519,15 +519,7 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
     }
   });
 
-  document.getElementById('btn-pdf').addEventListener('click', () => {
-    const incomplete = config.skillGroups.filter(g => getSectionStatus(state.sections[g.id] || {}) === 'incomplete');
-    if (incomplete.length > 0) {
-      const names = incomplete.map(g => g.title).join('\n  • ');
-      const proceed = confirm(`${incomplete.length} section${incomplete.length > 1 ? 's are' : ' is'} not yet complete:\n\n  • ${names}\n\nYou can still save a PDF of the current state, but the suitability summary will show as incomplete. Continue?`);
-      if (!proceed) return;
-    }
-    window.print();
-  });
+  document.getElementById('btn-pdf').addEventListener('click', () => window.print());
 }
 
 // ── Section rendering ─────────────────────────────────────
@@ -646,8 +638,10 @@ function updateProgress(state, config) {
   const total = config.skillGroups.length;
   const el  = document.getElementById('progress-done');
   const bar = document.getElementById('progress-bar');
+  const pdf = document.getElementById('btn-pdf');
   if (el)  el.textContent = done;
   if (bar) bar.style.width = `${(done / total) * 100}%`;
+  if (pdf) pdf.disabled = done < total;
   updateSidebar(state, config);
 }
 

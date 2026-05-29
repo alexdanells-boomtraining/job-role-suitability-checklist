@@ -785,7 +785,8 @@ body {
   transition: border-color 0.12s, color 0.12s;
 }
 
-.btn-pdf:hover { border-color: var(--navy); color: var(--navy); }
+.btn-pdf:hover:not(:disabled) { border-color: var(--navy); color: var(--navy); }
+.btn-pdf:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-pdf.hidden { display: none; }
 
 /* ── Print / PDF styles ──────────────────────────────────── */
