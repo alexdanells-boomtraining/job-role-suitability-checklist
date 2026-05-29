@@ -18,59 +18,53 @@ const STANDARDS = {
   ],
 };
 
-let activeId = null;
+let activeCategory = Object.keys(STANDARDS)[0];
+let activeId = STANDARDS[activeCategory][0].id;
 
 // ── Nav ──────────────────────────────────────────────────
 
 function buildNav() {
-  const nav = document.getElementById('main-nav');
-
-  Object.entries(STANDARDS).forEach(([group, standards]) => {
-    const groupEl = document.createElement('div');
-    groupEl.className = 'nav-group';
-
-    const btn = document.createElement('button');
-    btn.className = 'nav-group-btn';
-    btn.innerHTML = `${group} <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg>`;
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = groupEl.classList.contains('open');
-      closeAllDropdowns();
-      if (!isOpen) groupEl.classList.add('open');
-    });
-
-    const dropdown = document.createElement('div');
-    dropdown.className = 'dropdown';
-
-    standards.forEach(({ id, label }) => {
-      const item = document.createElement('button');
-      item.className = 'dropdown-item';
-      item.textContent = label;
-      item.dataset.id = id;
-      item.addEventListener('click', () => {
-        closeAllDropdowns();
-        setActive(id);
-      });
-      dropdown.appendChild(item);
-    });
-
-    groupEl.appendChild(btn);
-    groupEl.appendChild(dropdown);
-    nav.appendChild(groupEl);
-  });
-
-  document.addEventListener('click', closeAllDropdowns);
+  renderCategoryRow();
+  renderStandardRow();
 }
 
-function closeAllDropdowns() {
-  document.querySelectorAll('.nav-group.open').forEach(g => g.classList.remove('open'));
+function renderCategoryRow() {
+  const row = document.getElementById('nav-categories');
+  row.innerHTML = '';
+  Object.keys(STANDARDS).forEach(group => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-tab' + (group === activeCategory ? ' active' : '');
+    btn.textContent = group;
+    btn.addEventListener('click', () => {
+      activeCategory = group;
+      activeId = STANDARDS[group][0].id;
+      renderCategoryRow();
+      renderStandardRow();
+      renderContent();
+    });
+    row.appendChild(btn);
+  });
+}
+
+function renderStandardRow() {
+  const row = document.getElementById('nav-standards');
+  row.innerHTML = '';
+  STANDARDS[activeCategory].forEach(({ id, label }) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-tab' + (id === activeId ? ' active' : '');
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      activeId = id;
+      renderStandardRow();
+      renderContent();
+    });
+    row.appendChild(btn);
+  });
 }
 
 function setActive(id) {
   activeId = id;
-  document.querySelectorAll('.dropdown-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.id === id);
-  });
+  renderStandardRow();
   renderContent();
 }
 
