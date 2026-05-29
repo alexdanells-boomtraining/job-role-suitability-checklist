@@ -788,6 +788,10 @@ body {
   border: 1px solid #ffc107;
   border-radius: var(--radius);
   padding: 0.6rem 1rem;
+  position: sticky;
+  top: var(--header-h, 110px);
+  z-index: 45;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .demo-active-label {

@@ -512,6 +512,7 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
       renderChecklist(document.getElementById('app'), standardId, title, config, config.demoState, true);
     } else {
       renderContent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
 
