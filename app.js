@@ -22,6 +22,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'security-compliance',
     title: 'Data Security & Compliance',
+    short: 'Data Security',
     skills: ['S1', 'S3'],
     description: 'The apprentice will need to handle data securely and responsibly, following your organisation\'s policies and legal requirements such as GDPR. This includes using data systems with appropriate access controls, understanding which data can and cannot be shared, and correctly classifying different types of data.',
     example: 'e.g. logging into a database or CRM with role-based access, handling customer records in line with your data protection policy, labelling files as confidential or restricted.',
@@ -29,6 +30,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'data-collection',
     title: 'Data Collection & Sourcing',
+    short: 'Data Collection',
     skills: ['S2', 'S8'],
     description: 'The apprentice will need to gather data from multiple sources — such as internal databases, spreadsheets, or external platforms — and understand how to combine these datasets safely. This covers the full journey from identifying where data lives to preparing it for analysis.',
     example: 'e.g. pulling monthly sales data from a database, combining CRM exports with finance reports, downloading datasets from a third-party portal.',
@@ -36,6 +38,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'data-quality',
     title: 'Data Cleaning & Quality',
+    short: 'Data Quality',
     skills: ['S4', 'S6'],
     description: 'The apprentice will need to work with real-world data that may contain errors, gaps, or inconsistencies — and know how to identify, fix, or escalate these issues. They\'ll also work across different data formats such as structured tables, spreadsheets, and unstructured text.',
     example: 'e.g. removing duplicate customer records, identifying a report with missing values and flagging it to a manager, working with both a database and a CSV export.',
@@ -43,6 +46,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'analysis-statistics',
     title: 'Analysis & Statistical Methods',
+    short: 'Analysis & Stats',
     skills: ['S10', 'S13'],
     description: 'The apprentice will need to apply analytical techniques to real data — from calculating trends and averages through to more advanced methods such as forecasting, pattern recognition, or time series analysis. Complexity can grow as the apprenticeship progresses.',
     example: 'e.g. producing a monthly performance trend report, identifying a seasonal pattern in sales data, running a basic regression, forecasting next quarter\'s demand.',
@@ -50,6 +54,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'predictive-analytics',
     title: 'Predictive & Forward-Looking Analysis',
+    short: 'Predictive Analysis',
     skills: ['S11'],
     description: 'The apprentice will need some exposure to using data to make predictions or support future planning. This doesn\'t require complex machine learning — it could be forecasting models in Excel, trend lines in a BI tool, or scenario planning with data.',
     example: 'e.g. building a revenue forecast, modelling the impact of a pricing change, predicting stock levels based on historical demand.',
@@ -57,6 +62,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'data-governance',
     title: 'Data Architecture & Governance',
+    short: 'Data Governance',
     skills: ['S9'],
     description: 'The apprentice will need to understand how your organisation structures and governs its data — including where data is stored, who is responsible for it, and how it moves across systems. They don\'t need to design the architecture, but should work within it day-to-day.',
     example: 'e.g. knowing which system is the source of truth for customer data, understanding the difference between a data warehouse and operational databases, following a data governance or retention policy.',
@@ -64,6 +70,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'reporting-visualisation',
     title: 'Reporting & Data Visualisation',
+    short: 'Reporting & Viz',
     skills: ['S14'],
     description: 'The apprentice will need to regularly turn data into visual outputs that communicate findings clearly to others — such as dashboards, charts, graphs, or written reports. This is a core part of the role and a significant element of the End Point Assessment.',
     example: 'e.g. building and maintaining a Power BI or Tableau dashboard, producing a weekly performance report in Excel, creating charts for a management presentation.',
@@ -71,6 +78,7 @@ const DA_SKILL_GROUPS = [
   {
     id: 'stakeholder-comms',
     title: 'Stakeholder Engagement & Communication',
+    short: 'Stakeholder Comms',
     skills: ['S5', 'S7', 'S12'],
     description: 'The apprentice will need to work with colleagues or clients to understand what they need from data, and present findings back in a clear and appropriate way — adapting their communication style for both technical and non-technical audiences.',
     example: 'e.g. meeting with a department head to agree what metrics to track, presenting a data summary to a senior leadership team, writing a plain-English summary of analysis findings.',
@@ -159,7 +167,7 @@ function loadState() {
     if (saved) return saved;
   } catch {}
   return {
-    meta: { apprentice: '', completer: '', job_title: '', date: todayISO() },
+    meta: { employer: '', apprentice: '', completer: '', job_title: '', date: todayISO() },
     sections: {},
     tools: [],
     tools_other: '',
@@ -260,6 +268,10 @@ function findStandard(id) {
 }
 
 function renderContent() {
+  const existing = document.getElementById('section-sidebar');
+  if (existing) existing.remove();
+  if (window._sidebarObserver) { window._sidebarObserver.disconnect(); window._sidebarObserver = null; }
+
   const app = document.getElementById('app');
   const standard = findStandard(activeId);
   if (!standard) return;
@@ -297,8 +309,12 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
       <div class="meta-card-header">Checklist Details</div>
       <div class="meta-grid">
         <div class="meta-field">
-          <label class="meta-label" for="meta-apprentice">Apprentice Name <span class="optional">(optional — leave blank if not yet known)</span></label>
-          <input type="text" id="meta-apprentice" class="text-input" placeholder="e.g. Jane Smith" value="${meta.apprentice || ''}" />
+          <label class="meta-label" for="meta-employer">Employer Name</label>
+          <input type="text" id="meta-employer" class="text-input" placeholder="e.g. Acme Ltd" value="${meta.employer || ''}" />
+        </div>
+        <div class="meta-field">
+          <label class="meta-label" for="meta-apprentice">Apprentice Name <span class="optional">(optional)</span></label>
+          <input type="text" id="meta-apprentice" class="text-input" placeholder="Leave blank if not yet known" value="${meta.apprentice || ''}" />
         </div>
         <div class="meta-field">
           <label class="meta-label" for="meta-date">Date of Completion</label>
@@ -345,7 +361,7 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
       </div>
     </div>
 
-    <div class="section-card additional-card">
+    <div class="section-card additional-card" id="additional-card">
       <div class="section-card-header">
         <div class="section-header-left">
           <span class="section-num">${total + 2}</span>
@@ -376,8 +392,12 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
   renderSkillSections(state);
   renderToolsGrid(state);
 
+  // Set header height CSS variable for sticky meta card + sidebar positioning
+  const headerEl = document.querySelector('.site-header');
+  if (headerEl) document.documentElement.style.setProperty('--header-h', headerEl.offsetHeight + 'px');
+
   // Meta fields
-  const metaFields = { 'meta-apprentice': 'apprentice', 'meta-date': 'date', 'meta-completer': 'completer', 'meta-title': 'job_title' };
+  const metaFields = { 'meta-employer': 'employer', 'meta-apprentice': 'apprentice', 'meta-date': 'date', 'meta-completer': 'completer', 'meta-title': 'job_title' };
   Object.entries(metaFields).forEach(([elId, key]) => {
     document.getElementById(elId).addEventListener('input', e => {
       if (!state.meta) state.meta = {};
@@ -389,6 +409,9 @@ function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
   // Access & additional info fields
   document.getElementById('tools-access').addEventListener('input', e => { state.tools_access = e.target.value; saveState(state); });
   document.getElementById('additional-info').addEventListener('input', e => { state.additional_info = e.target.value; saveState(state); });
+
+  // Build sidebar and set up scroll-reveal
+  if (!isDemo) buildSidebar(state);
 
   // Demo button
   document.getElementById('btn-demo').addEventListener('click', () => {
@@ -567,6 +590,7 @@ function updateProgress(state) {
   const bar = document.getElementById('progress-bar');
   if (el) el.textContent = done;
   if (bar) bar.style.width = `${(done / total) * 100}%`;
+  updateSidebar(state);
 }
 
 function renderToolsGrid(state) {
@@ -629,6 +653,10 @@ function renderResults(state) {
 
       <div class="results-meta">
         <div class="results-meta-row">
+          <span class="results-meta-label">Employer</span>
+          <span>${m.employer || '—'}</span>
+        </div>
+        <div class="results-meta-row">
           <span class="results-meta-label">Apprentice</span>
           <span>${m.apprentice || 'Not specified'}</span>
         </div>
@@ -664,17 +692,90 @@ function renderResults(state) {
   `;
 }
 
+// ── Sidebar ───────────────────────────────────────────────
+
+function buildSidebar(state) {
+  const existing = document.getElementById('section-sidebar');
+  if (existing) existing.remove();
+  if (window._sidebarObserver) { window._sidebarObserver.disconnect(); window._sidebarObserver = null; }
+
+  const sidebar = document.createElement('aside');
+  sidebar.className = 'section-sidebar';
+  sidebar.id = 'section-sidebar';
+  sidebar.innerHTML = `<div class="sidebar-heading">Sections</div><nav id="sidebar-nav"></nav>`;
+  document.body.appendChild(sidebar);
+
+  updateSidebar(state);
+
+  const progressEl = document.querySelector('.form-progress');
+  if (progressEl) {
+    window._sidebarObserver = new IntersectionObserver(([entry]) => {
+      const sb = document.getElementById('section-sidebar');
+      if (!sb) { window._sidebarObserver.disconnect(); return; }
+      sb.classList.toggle('visible', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    window._sidebarObserver.observe(progressEl);
+  }
+}
+
+function updateSidebar(state) {
+  const nav = document.getElementById('sidebar-nav');
+  if (!nav) return;
+
+  const total = DA_SKILL_GROUPS.length;
+  const done = completedCount(state);
+
+  const sectionItems = DA_SKILL_GROUPS.map((g, idx) => {
+    const st = getSectionStatus(state.sections[g.id] || {});
+    return `<button class="sidebar-item" data-target="card-${g.id}">
+      <span class="sidebar-dot status-dot-${st}"></span>
+      <span class="sidebar-num">${idx + 1}</span>
+      <span class="sidebar-label">${g.short}</span>
+    </button>`;
+  }).join('');
+
+  nav.innerHTML = `
+    ${sectionItems}
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-item sidebar-extra" data-target="tools-card">
+      <span class="sidebar-dot sidebar-dot-neutral"></span>
+      <span class="sidebar-num">${total + 1}</span>
+      <span class="sidebar-label">Tools &amp; Tech</span>
+    </button>
+    <button class="sidebar-item sidebar-extra" data-target="additional-card">
+      <span class="sidebar-dot sidebar-dot-neutral"></span>
+      <span class="sidebar-num">${total + 2}</span>
+      <span class="sidebar-label">Additional Info</span>
+    </button>
+    <div class="sidebar-footer">
+      <div class="sidebar-progress-text">${done} of ${total} complete</div>
+      <div class="sidebar-progress-track"><div class="sidebar-progress-fill" style="width:${(done/total)*100}%"></div></div>
+    </div>
+  `;
+
+  nav.querySelectorAll('.sidebar-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
+      const headerH = document.querySelector('.site-header')?.offsetHeight || 0;
+      const metaH = document.querySelector('.meta-card')?.offsetHeight || 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerH - metaH - 12;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+}
+
 // ── Demo state ────────────────────────────────────────────
 
 const DEMO_STATE = {
-  meta: { apprentice: 'Jamie Williams', completer: 'Sarah Ahmed', job_title: 'Head of Analytics', date: '2026-05-29' },
+  meta: { employer: 'Meridian Analytics Ltd', apprentice: 'Jamie Williams', completer: 'Sarah Ahmed', job_title: 'Head of Analytics', date: '2026-05-29' },
   sections: {
     'security-compliance':    { exposure: 'significant', frequency: 'daily',     comment: '' },
     'data-collection':        { exposure: 'significant', frequency: 'often',     comment: '' },
-    'data-quality':           { exposure: 'moderate',    frequency: 'often',     comment: '' },
-    'analysis-statistics':    { exposure: 'moderate',    frequency: 'sometimes', comment: '' },
+    'data-quality':           { exposure: 'moderate',    frequency: 'often',     comment: 'The team works primarily with clean, pre-processed data from our data warehouse. Jamie will have regular exposure to data quality issues through ad hoc analysis and reporting tasks, and will be involved in our quarterly data audit process.' },
+    'analysis-statistics':    { exposure: 'moderate',    frequency: 'sometimes', comment: 'Statistical methods are applied on a project basis rather than daily. Jamie will support the senior analyst on monthly trend analysis and will lead a customer segmentation project in their second quarter, providing direct hands-on experience.' },
     'predictive-analytics':   { exposure: 'limited',     frequency: 'rarely',    comment: 'The team does not currently use predictive modelling as standard practice. However, Jamie will work with our external data science partners on a demand forecasting project planned for Q4, which will provide structured exposure to this area.' },
-    'data-governance':        { exposure: 'moderate',    frequency: 'sometimes', comment: '' },
+    'data-governance':        { exposure: 'moderate',    frequency: 'sometimes', comment: 'Data governance is managed centrally. Jamie will work within the established framework and will attend the quarterly data governance review meetings, giving direct exposure to policy and architecture decisions.' },
     'reporting-visualisation':{ exposure: 'significant', frequency: 'daily',     comment: '' },
     'stakeholder-comms':      { exposure: 'significant', frequency: 'often',     comment: '' },
   },
