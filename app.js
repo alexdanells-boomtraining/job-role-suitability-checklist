@@ -408,6 +408,35 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
       </div>
     </div>
 
+    <div class="rating-guide" id="rating-guide">
+      <button class="rating-guide-toggle" id="rating-guide-toggle">
+        <span>How to complete this form</span>
+        <span class="rating-guide-chevron">−</span>
+      </button>
+      <div class="rating-guide-body" id="rating-guide-body">
+        <div class="rating-guide-cols">
+          <div class="rating-guide-col">
+            <h4>Level of exposure</h4>
+            <ul>
+              <li><strong>Limited</strong> — The role touches this occasionally or only in a narrow context. Significant support or additional project work will be needed to build the required competence.</li>
+              <li><strong>Moderate</strong> — The role provides meaningful but not core exposure. The apprentice will encounter this regularly enough to develop with guidance.</li>
+              <li><strong>Significant</strong> — This is a core part of the role. The apprentice will have regular, substantive hands-on exposure that directly builds the required skills.</li>
+            </ul>
+          </div>
+          <div class="rating-guide-col">
+            <h4>How often will the apprentice encounter this?</h4>
+            <ul>
+              <li><strong>Rarely</strong> — Less than once a month; only on specific projects or occasional tasks.</li>
+              <li><strong>Sometimes</strong> — A few times a month.</li>
+              <li><strong>Often</strong> — Several times a week.</li>
+              <li><strong>Daily</strong> — Every working day, or near-daily.</li>
+            </ul>
+            <p class="rating-guide-note">Where exposure is <strong>Limited</strong> or <strong>Moderate</strong>, or frequency is <strong>Rarely</strong> or <strong>Sometimes</strong>, a written explanation is required.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="form-progress">
       <div class="progress-text"><span id="progress-done">${done}</span> of ${total} sections completed</div>
       <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-bar" style="width:${(done/total)*100}%"></div></div>
@@ -484,6 +513,13 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
     } else {
       renderContent();
     }
+  });
+
+  document.getElementById('rating-guide-toggle').addEventListener('click', () => {
+    const body    = document.getElementById('rating-guide-body');
+    const chevron = document.querySelector('.rating-guide-chevron');
+    const collapsed = body.classList.toggle('collapsed');
+    chevron.textContent = collapsed ? '+' : '−';
   });
 
   document.getElementById('tools-header').addEventListener('click', () => {
