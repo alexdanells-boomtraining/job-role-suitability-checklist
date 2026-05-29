@@ -228,11 +228,9 @@ body {
   display: none;
 }
 
-/* ── Sticky meta card ────────────────────────────────────── */
+/* ── Meta card ───────────────────────────────────────────── */
 .meta-card {
-  position: sticky;
-  top: var(--header-h, 110px);
-  z-index: 40;
+  position: static;
 }
 
 /* ── Section card status variants ───────────────────────── */
