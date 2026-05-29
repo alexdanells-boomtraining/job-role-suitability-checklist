@@ -236,19 +236,25 @@ body {
   font-weight: 700;
 }
 
-.skill-badges {
+.skills-line {
   display: flex;
-  gap: 0.3rem;
-  margin-top: 0.25rem;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 0.2rem;
 }
 
-.skill-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  background: rgba(0,212,122,0.2);
-  color: var(--green);
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
+.skill-item {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.58);
+  cursor: help;
+  transition: color 0.1s;
+}
+
+.skill-item:hover { color: rgba(255,255,255,0.9); }
+
+.skill-item + .skill-item::before {
+  content: ' · ';
+  color: rgba(255,255,255,0.25);
 }
 
 .section-status-dot {
@@ -578,3 +584,123 @@ body {
   text-align: center;
   padding-bottom: 2rem;
 }
+
+/* ── Meta card (checklist details) ──────────────────────── */
+.meta-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.75rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.meta-card-header {
+  padding: 0.75rem 1.25rem;
+  background: var(--navy2);
+  color: var(--white);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+  padding: 1.25rem;
+}
+
+.meta-field { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.meta-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* ── Demo bar ────────────────────────────────────────────── */
+.demo-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.demo-bar-active {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: var(--radius);
+  padding: 0.6rem 1rem;
+}
+
+.demo-active-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #856404;
+  flex: 1;
+}
+
+.btn-demo {
+  background: #dc2626;
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.5rem 1.1rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+
+.btn-demo:hover { background: #b91c1c; }
+
+.btn-demo-exit {
+  background: none;
+  border: 1px solid #856404;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #856404;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-demo-exit:hover { background: rgba(133,100,4,0.08); }
+
+.demo-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ── Field hint ──────────────────────────────────────────── */
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* ── Results meta block ──────────────────────────────────── */
+.results-meta {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+}
+
+.results-meta-row { display: flex; flex-direction: column; gap: 0.1rem; }
+.results-meta-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }

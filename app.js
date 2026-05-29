@@ -95,6 +95,42 @@ const DA_TOOLS = [
   { id: 'sap',        label: 'SAP' },
 ];
 
+const SKILL_SHORT = {
+  S1:  'Secure data use & GDPR',
+  S2:  'Data analysis lifecycle',
+  S3:  'Data classification',
+  S4:  'Dataset analysis',
+  S5:  'UX & domain context',
+  S6:  'Quality risk management',
+  S7:  'Customer requirements analysis',
+  S8:  'Data sourcing & combination',
+  S9:  'Organisational data architecture',
+  S10: 'Statistical methods',
+  S11: 'Predictive analytics',
+  S12: 'Stakeholder communication',
+  S13: 'Analytical techniques (mining, forecasting)',
+  S14: 'Data visualisation & reporting',
+  S15: 'Tool selection & application',
+};
+
+const SKILL_FULL = {
+  S1:  'Use data systems securely to meet requirements and in line with organisational procedures and legislation including principles of Privacy by Design',
+  S2:  'Implement the stages of the data analysis lifecycle',
+  S3:  'Apply principles of data classification within data analysis activity',
+  S4:  'Analyse data sets taking account of different data structures and database designs',
+  S5:  'Assess the impact on user experience and domain context on data analysis activity',
+  S6:  'Identify and escalate quality risks in data analysis with suggested mitigation or resolutions as appropriate',
+  S7:  'Undertake customer requirements analysis and implement findings in data analytics planning and outputs',
+  S8:  'Identify data sources and the risks and challenges to combination within data analysis activity',
+  S9:  'Apply organisational architecture requirements to data analysis activities',
+  S10: 'Apply statistical methodologies to data analysis tasks',
+  S11: 'Apply predictive analytics in the collation and use of data',
+  S12: 'Collaborate and communicate with a range of internal and external stakeholders using appropriate styles and behaviours to suit the audience',
+  S13: 'Use a range of analytical techniques such as data mining, time series forecasting and modelling techniques to identify and predict trends and patterns in data',
+  S14: 'Collate and interpret qualitative and quantitative data and convert into infographics, reports, tables, dashboards and graphs',
+  S15: 'Select and apply the most appropriate data tools to achieve the optimum outcome',
+};
+
 const EXPOSURE_OPTIONS = [
   { value: 'limited',     label: 'Limited',     color: 'red'   },
   { value: 'moderate',    label: 'Moderate',    color: 'amber' },
@@ -112,12 +148,24 @@ const FREQUENCY_OPTIONS = [
 
 const STATE_KEY = 'jrsc_l4-data-analyst';
 
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
 function loadState() {
   try {
-    return JSON.parse(localStorage.getItem(STATE_KEY)) || { sections: {}, tools: [], tools_other: '' };
-  } catch {
-    return { sections: {}, tools: [], tools_other: '' };
-  }
+    const saved = JSON.parse(localStorage.getItem(STATE_KEY));
+    if (saved) return saved;
+  } catch {}
+  return {
+    meta: { apprentice: '', completer: '', job_title: '', date: todayISO() },
+    sections: {},
+    tools: [],
+    tools_other: '',
+    tools_access: '',
+    additional_info: '',
+  };
 }
 
 function saveState(state) {
@@ -225,16 +273,42 @@ function renderContent() {
 
 // ── Data Analyst form ─────────────────────────────────────
 
-function renderDataAnalyst(app, title) {
-  const state = loadState();
+function renderDataAnalyst(app, title, overrideState = null, isDemo = false) {
+  const state = overrideState || loadState();
   const done = completedCount(state);
   const total = DA_SKILL_GROUPS.length;
+
+  const meta = state.meta || {};
 
   app.innerHTML = `
     <div class="checklist-header">
       <span class="level-badge">Level 4</span>
       <h2>${title}</h2>
       <p>Work through each section below to assess whether the apprentice's role provides sufficient exposure across the required skill areas. Your responses will determine whether the apprenticeship is recommended to proceed.</p>
+    </div>
+
+    ${isDemo ? `<div class="demo-bar demo-bar-active"><span class="demo-active-label">Demo mode — this is an example completed form</span><button class="btn-demo-exit" id="btn-demo">Exit Demo</button></div>` : `<div class="demo-bar"><button class="btn-demo" id="btn-demo">View Example Completed Form</button><span class="demo-hint">See how a completed checklist looks before you begin</span></div>`}
+
+    <div class="meta-card">
+      <div class="meta-card-header">Checklist Details</div>
+      <div class="meta-grid">
+        <div class="meta-field">
+          <label class="meta-label" for="meta-apprentice">Apprentice Name <span class="optional">(optional — leave blank if not yet known)</span></label>
+          <input type="text" id="meta-apprentice" class="text-input" placeholder="e.g. Jane Smith" value="${meta.apprentice || ''}" />
+        </div>
+        <div class="meta-field">
+          <label class="meta-label" for="meta-date">Date of Completion</label>
+          <input type="date" id="meta-date" class="text-input" value="${meta.date || todayISO()}" />
+        </div>
+        <div class="meta-field">
+          <label class="meta-label" for="meta-completer">Completed by</label>
+          <input type="text" id="meta-completer" class="text-input" placeholder="Full name" value="${meta.completer || ''}" />
+        </div>
+        <div class="meta-field">
+          <label class="meta-label" for="meta-title">Job Title</label>
+          <input type="text" id="meta-title" class="text-input" placeholder="e.g. HR Manager" value="${meta.job_title || ''}" />
+        </div>
+      </div>
     </div>
 
     <div class="form-progress">
@@ -259,6 +333,28 @@ function renderDataAnalyst(app, title) {
           <label class="field-label" for="tools-other">Any other tools or systems not listed above:</label>
           <input type="text" id="tools-other" class="text-input" placeholder="e.g. Qlik Sense, dbt, Alteryx, Knime..." value="${state.tools_other || ''}" />
         </div>
+        <div class="tools-other-wrap">
+          <label class="field-label" for="tools-access">System access &amp; permissions</label>
+          <p class="field-hint">Does the apprentice need to make a formal request to gain access to any of these systems? If so, please describe the process or any restrictions that may apply.</p>
+          <textarea id="tools-access" class="comment-textarea" rows="3" placeholder="e.g. Database access requires IT team approval and a data handling agreement to be signed. CRM access is granted on day one via line manager request...">${state.tools_access || ''}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card additional-card">
+      <div class="section-card-header">
+        <div class="section-header-left">
+          <span class="section-num">${total + 2}</span>
+          <h3>Additional Information</h3>
+        </div>
+      </div>
+      <div class="section-card-body">
+        <div class="section-description">
+          <p>Is there anything else you'd like to share that may be relevant to this assessment? This could include information about team routines, the apprentice's existing knowledge, working patterns, planned projects, or anything else that gives us a fuller picture of the role.</p>
+        </div>
+        <div class="rating-area">
+          <textarea id="additional-info" class="comment-textarea" rows="5" placeholder="e.g. The apprentice will join the team's weekly data review every Monday. They will initially shadow a senior analyst before taking on their own projects in month 3. The business is planning a BI migration in Q3 which will provide significant hands-on exposure...">${state.additional_info || ''}</textarea>
+        </div>
       </div>
     </div>
 
@@ -272,6 +368,29 @@ function renderDataAnalyst(app, title) {
 
   renderSkillSections(state);
   renderToolsGrid(state);
+
+  // Meta fields
+  const metaFields = { 'meta-apprentice': 'apprentice', 'meta-date': 'date', 'meta-completer': 'completer', 'meta-title': 'job_title' };
+  Object.entries(metaFields).forEach(([elId, key]) => {
+    document.getElementById(elId).addEventListener('input', e => {
+      if (!state.meta) state.meta = {};
+      state.meta[key] = e.target.value;
+      saveState(state);
+    });
+  });
+
+  // Access & additional info fields
+  document.getElementById('tools-access').addEventListener('input', e => { state.tools_access = e.target.value; saveState(state); });
+  document.getElementById('additional-info').addEventListener('input', e => { state.additional_info = e.target.value; saveState(state); });
+
+  // Demo button
+  document.getElementById('btn-demo').addEventListener('click', () => {
+    if (!isDemo) {
+      renderDataAnalyst(document.getElementById('app'), title, DEMO_STATE, true);
+    } else {
+      renderContent();
+    }
+  });
 
   document.getElementById('tools-header').addEventListener('click', () => {
     const body = document.getElementById('tools-body');
@@ -303,13 +422,16 @@ function renderSkillSections(state) {
 function buildSectionCard(group, state, num) {
   const sec = state.sections[group.id] || {};
   const status = getSectionStatus(sec);
-  const isOpen = !!(sec.exposure && sec.frequency);
+  // Open by default; collapse automatically once both ratings are set
+  const isOpen = !(sec.exposure && sec.frequency);
 
   const card = document.createElement('div');
   card.className = 'section-card' + (status !== 'incomplete' ? ' status-' + status : '');
   card.id = 'card-' + group.id;
 
-  const badges = group.skills.map(s => `<span class="skill-badge">${s}</span>`).join('');
+  const skillsLine = group.skills.map(s =>
+    `<span class="skill-item" title="${SKILL_FULL[s]}">${s}: ${SKILL_SHORT[s]}</span>`
+  ).join('');
 
   card.innerHTML = `
     <div class="section-card-header">
@@ -317,7 +439,7 @@ function buildSectionCard(group, state, num) {
         <span class="section-num">${num}</span>
         <div>
           <h3>${group.title}</h3>
-          <div class="skill-badges">${badges}</div>
+          <div class="skills-line">${skillsLine}</div>
         </div>
       </div>
       <div class="section-header-right">
@@ -373,6 +495,12 @@ function buildSectionCard(group, state, num) {
       const status = getSectionStatus(state.sections[gid]);
       card.className = 'section-card' + (status !== 'incomplete' ? ' status-' + status : '');
       card.querySelector('.section-status-dot').className = 'section-status-dot status-dot-' + status;
+      // Auto-collapse once both ratings are complete
+      const s = state.sections[gid];
+      if (s.exposure && s.frequency) {
+        card.querySelector('.section-card-body').classList.add('collapsed');
+        card.querySelector('.section-toggle').textContent = '+';
+      }
       updateProgress(state);
     });
   });
@@ -451,10 +579,31 @@ function renderResults(state) {
 
   const toolLabels = (state.tools || []).map(id => DA_TOOLS.find(t => t.id === id)?.label).filter(Boolean);
   const toolsStr = [...toolLabels, ...(state.tools_other ? [state.tools_other] : [])].join(', ') || 'None recorded';
+  const m = state.meta || {};
 
   panel.innerHTML = `
     <div class="results-panel-inner">
       <h2 class="results-title">Suitability Summary</h2>
+
+      <div class="results-meta">
+        <div class="results-meta-row">
+          <span class="results-meta-label">Apprentice</span>
+          <span>${m.apprentice || 'Not specified'}</span>
+        </div>
+        <div class="results-meta-row">
+          <span class="results-meta-label">Completed by</span>
+          <span>${m.completer || '—'}${m.job_title ? `, ${m.job_title}` : ''}</span>
+        </div>
+        <div class="results-meta-row">
+          <span class="results-meta-label">Date</span>
+          <span>${m.date || '—'}</span>
+        </div>
+        <div class="results-meta-row">
+          <span class="results-meta-label">Standard</span>
+          <span>Level 4 Data Analyst (ST0118 v1.1)</span>
+        </div>
+      </div>
+
       <div class="verdict-banner ${cfg.cls}">
         <span class="verdict-label">${cfg.label}</span>
         <p class="verdict-msg">${cfg.msg}</p>
@@ -465,11 +614,33 @@ function renderResults(state) {
           <tbody>${rows}</tbody>
         </table>
       </div>
-      <div class="results-tools"><strong>Tools &amp; Technologies declared:</strong> ${toolsStr}</div>
+      <div class="results-tools"><strong>Tools &amp; Technologies:</strong> ${toolsStr}</div>
+      ${state.tools_access ? `<div class="results-tools"><strong>System access notes:</strong> ${state.tools_access}</div>` : ''}
+      ${state.additional_info ? `<div class="results-tools"><strong>Additional information:</strong> ${state.additional_info}</div>` : ''}
       <p class="results-footer">This checklist is for guidance and internal assessment only. Final enrolment decisions rest with Boom Training in consultation with the employer and apprentice.</p>
     </div>
   `;
 }
+
+// ── Demo state ────────────────────────────────────────────
+
+const DEMO_STATE = {
+  meta: { apprentice: 'Jamie Williams', completer: 'Sarah Ahmed', job_title: 'Head of Analytics', date: '2026-05-29' },
+  sections: {
+    'security-compliance':    { exposure: 'significant', frequency: 'daily',     comment: '' },
+    'data-collection':        { exposure: 'significant', frequency: 'often',     comment: '' },
+    'data-quality':           { exposure: 'moderate',    frequency: 'often',     comment: '' },
+    'analysis-statistics':    { exposure: 'moderate',    frequency: 'sometimes', comment: '' },
+    'predictive-analytics':   { exposure: 'limited',     frequency: 'rarely',    comment: 'The team does not currently use predictive modelling as standard practice. However, Jamie will work with our external data science partners on a demand forecasting project planned for Q4, which will provide structured exposure to this area.' },
+    'data-governance':        { exposure: 'moderate',    frequency: 'sometimes', comment: '' },
+    'reporting-visualisation':{ exposure: 'significant', frequency: 'daily',     comment: '' },
+    'stakeholder-comms':      { exposure: 'significant', frequency: 'often',     comment: '' },
+  },
+  tools: ['excel', 'powerbi', 'sql', 'python', 'azure'],
+  tools_other: 'SharePoint',
+  tools_access: 'Database and data warehouse access requires a formal IT request, signed off by the line manager. This typically takes 3–5 business days. Power BI and Excel access are granted on day one as part of standard onboarding.',
+  additional_info: 'Jamie will join the weekly analytics stand-up every Monday and present findings to the commercial team on a monthly basis. The business is planning a data warehouse migration in Q3, which will provide significant additional exposure to data architecture and tooling. The apprentice will initially shadow a senior analyst before taking on independent projects from month three.',
+};
 
 // ── Boot ──────────────────────────────────────────────────
 
