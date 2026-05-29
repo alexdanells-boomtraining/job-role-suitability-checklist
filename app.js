@@ -448,7 +448,7 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
     <div class="form-actions">
       <button class="btn-reset" id="btn-reset">Clear &amp; Start Again</button>
       <div class="form-actions-right">
-        <button class="btn-pdf hidden" id="btn-pdf">Save as PDF</button>
+        <button class="btn-pdf" id="btn-pdf">Save as PDF</button>
         <button class="btn-summary" id="btn-summary">View Suitability Summary</button>
       </div>
     </div>
@@ -509,7 +509,6 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
       return;
     }
     renderResults(state, config, standardId);
-    document.getElementById('btn-pdf').classList.remove('hidden');
     setTimeout(() => document.getElementById('results-panel').scrollIntoView({ behavior:'smooth' }), 50);
   });
 
@@ -520,7 +519,15 @@ function renderChecklist(app, standardId, title, config, overrideState = null, i
     }
   });
 
-  document.getElementById('btn-pdf').addEventListener('click', () => window.print());
+  document.getElementById('btn-pdf').addEventListener('click', () => {
+    const incomplete = config.skillGroups.filter(g => getSectionStatus(state.sections[g.id] || {}) === 'incomplete');
+    if (incomplete.length > 0) {
+      const names = incomplete.map(g => g.title).join('\n  • ');
+      const proceed = confirm(`${incomplete.length} section${incomplete.length > 1 ? 's are' : ' is'} not yet complete:\n\n  • ${names}\n\nYou can still save a PDF of the current state, but the suitability summary will show as incomplete. Continue?`);
+      if (!proceed) return;
+    }
+    window.print();
+  });
 }
 
 // ── Section rendering ─────────────────────────────────────
